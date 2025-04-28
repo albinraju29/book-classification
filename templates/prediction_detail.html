@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ prediction.file_name }} Analysis | BookClassify{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Futuristic Base Styling */
+    body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    .detail-container {
+        max-width: 900px;
+        margin: 0 auto; /* Changed from 2rem to 0 */
+        padding: 1rem; 
+        position: relative;
+    }
+
+    /* Cybernetic Grid Background */
+    .detail-container::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            linear-gradient(rgba(79,70,229,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79,70,229,0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    /* Holographic Detail Card */
+    .detail-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 
+            0 8px 32px rgba(0,0,0,0.2),
+            0 0 0 1px rgba(255,255,255,0.1) inset,
+            0 0 15px rgba(79,70,229,0.4);
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .detail-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+        animation: neon-pulse 2s infinite alternate;
+    }
+
+    @keyframes neon-pulse {
+        0% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+
+    /* Cover Display */
+    .detail-cover {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .detail-placeholder {
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(118,75,162,0.1));
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .detail-placeholder i {
+        color: rgba(79,70,229,0.5);
+        font-size: 4rem;
+        z-index: 1;
+    }
+
+    .detail-placeholder::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: conic-gradient(
+            from 45deg,
+            transparent 0% 25%,
+            rgba(79,70,229,0.15) 25% 50%,
+            transparent 50% 75%,
+            rgba(79,70,229,0.15) 75% 100%
+        );
+        background-size: 50px 50px;
+        animation: hologram-scan 6s linear infinite;
+    }
+
+    @keyframes hologram-scan {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 100px; }
+    }
+
+    /* Holographic Genre Badge */
+    .genre-badge {
+        background: linear-gradient(135deg, 
+            rgba(102,126,234,0.8), 
+            rgba(118,75,162,0.8));
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.3);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 20px rgba(102,126,234,0.3);
+        margin: 1rem 0;
+    }
+
+    .genre-badge::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.3) 50%,
+            rgba(255,255,255,0) 100%
+        );
+        transform: rotate(30deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) rotate(30deg); }
+        100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    /* Metadata Section */
+    .metadata-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .metadata-card {
+        background: rgba(30, 41, 59, 0.4);
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .metadata-card h5 {
+        color: #a5b4fc;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .metadata-card p {
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin: 1.5rem 0;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.7rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .action-btn i {
+        margin-right: 0.5rem;
+    }
+
+    .copy-btn {
+        background: rgba(79,70,229,0.15);
+        color: #a5b4fc;
+        border: 1px solid rgba(79,70,229,0.3);
+    }
+
+    .copy-btn:hover {
+        background: rgba(79,70,229,0.3);
+        color: #e0e7ff;
+    }
+
+    .download-btn {
+        background: linear-gradient(135deg, rgba(79,70,229,0.8), rgba(118,75,162,0.8));
+        color: white;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(79,70,229,0.4);
+    }
+
+    /* Text Blocks */
+    .text-block {
+        background: rgba(30, 41, 59, 0.4);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        border: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+    }
+
+    .text-block h4 {
+        margin-top: 0;
+        color: #a5b4fc;
+        display: flex;
+        align-items: center;
+    }
+
+    .text-block h4 i {
+        margin-right: 0.5rem;
+    }
+
+    .text-block p {
+        white-space: pre-wrap;
+    }
+
+    /* Confidence Meter */
+    .confidence-meter {
+        margin: 1.5rem 0;
+    }
+
+    .meter-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .meter-bar {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .meter-fill {
+        height: 100%;
+        width: 85%; /* Adjust based on actual confidence */
+        background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .meter-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            90deg,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.3) 50%,
+            rgba(255,255,255,0) 100%
+        );
+        animation: meter-shine 2s infinite;
+    }
+
+    @keyframes meter-shine {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    /* Back Button */
+    .back-btn {
+        margin-top: 2rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #e2e8f0;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .detail-container {
+            padding: 1rem;
+        }
+        
+        .detail-card {
+            padding: 1.5rem;
+        }
+        
+        .metadata-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    /* Particle Background */
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-card">
+        <!-- Cover Display -->
+        {% if prediction.image_file %}
+            <img src="{{ prediction.image_file.url }}" alt="Book cover" class="detail-cover">
+        {% else %}
+            <div class="detail-placeholder">
+                <i class="fas fa-book"></i>
+            </div>
+        {% endif %}
+        
+        <!-- Main Title -->
+        <h2 style="margin-bottom: 0.5rem;">{{ prediction.file_name }}</h2>
+        
+        <!-- Genre Badge -->
+        <div class="genre-badge">
+            <i class="fas fa-robot"></i> PREDICTED GENRE: {{ prediction.predicted_genre|upper }}
+        </div>
+        
+        <!-- Confidence Meter -->
+        <div class="confidence-meter">
+            <div class="meter-label">
+                <span>AI Confidence Level</span>
+                <span>85%</span> <!-- Replace with actual confidence if available -->
+            </div>
+            <div class="meter-bar">
+                <div class="meter-fill"></div>
+            </div>
+        </div>
+        
+        <!-- Metadata Grid -->
+        <div class="metadata-grid">
+            <div class="metadata-card">
+                <h5><i class="fas fa-file"></i> File Type</h5>
+                <p>{{ prediction.file_type|default:"N/A"|upper }}</p>
+            </div>
+            
+            <div class="metadata-card">
+                <h5><i class="fas fa-calendar"></i> Date Analyzed</h5>
+                <p>{{ prediction.uploaded_at|date:"M j, Y" }}</p>
+            </div>
+            
+            <div class="metadata-card">
+                <h5><i class="fas fa-clock"></i> Time Analyzed</h5>
+                <p>{{ prediction.uploaded_at|time:"H:i" }}</p>
+            </div>
+            
+            <div class="metadata-card">
+                <h5><i class="fas fa-database"></i> File Size</h5>
+                <p>{% if prediction.image_file %}{{ prediction.image_file.size|filesizeformat }}{% else %}N/A{% endif %}</p>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="action-btn copy-btn" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> Copy Text
+            </button>
+            
+            {% if prediction.image_file %}
+            <a href="{{ prediction.image_file.url }}" download class="action-btn download-btn">
+                <i class="fas fa-download"></i> Download File
+            </a>
+            {% endif %}
+            
+            {% if prediction.extracted_text %}
+            <button class="action-btn copy-btn" onclick="copyExtractedText()">
+                <i class="fas fa-copy"></i> Copy Extracted Text
+            </button>
+            {% endif %}
+        </div>
+        
+        <!-- Description Block -->
+        {% if prediction.description %}
+        <div class="text-block">
+            <h4><i class="fas fa-align-left"></i> DESCRIPTION</h4>
+            <p>{{ prediction.description }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Extracted Text Block -->
+        {% if prediction.extracted_text %}
+        <div class="text-block">
+            <h4><i class="fas fa-font"></i> EXTRACTED TEXT</h4>
+            <p>{{ prediction.extracted_text }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Back Button -->
+        <a href="{% url 'recent_predictions' %}" class="btn back-btn">
+            <i class="fas fa-arrow-left"></i> Return to Prediction Archive
+        </a>
+    </div>
+</div>
+
+<script>
+    // Copy to Clipboard Function
+    function copyToClipboard() {
+        const textToCopy = `Book: {{ prediction.file_name }}\n` +
+                          `Predicted Genre: {{ prediction.predicted_genre }}\n` +
+                          `Date Analyzed: {{ prediction.uploaded_at|date:"M j, Y" }}\n` +
+                          `{% if prediction.description %}Description: {{ prediction.description }}\n{% endif %}`;
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('Prediction details copied to clipboard!');
+        });
+    }
+
+    // Copy Extracted Text Function
+    function copyExtractedText() {
+        navigator.clipboard.writeText(`{{ prediction.extracted_text }}`).then(() => {
+            alert('Extracted text copied to clipboard!');
+        });
+    }
+
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any initialization code here
+    });
+</script>
+{% endblock %}

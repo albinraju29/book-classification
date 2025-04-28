@@ -1,0 +1,31 @@
+<h2>Model Test Cases</h2>
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Input Text</th>
+            <th>Expected</th>
+            <th>Prediction Code</th>
+            <th>Genre Code</th>
+            <th>Display</th>
+            <th>Match?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in results %}
+        <tr class="{% if r.match %}table-success{% elif 'error' in r %}table-danger{% endif %}">
+            <td>{{ r.input }}</td>
+            <td>{{ r.expected }}</td>
+            <td>{{ r.prediction|default:'N/A' }}</td>
+            <td>{{ r.genre_code|default:'N/A' }}</td>
+            <td>{{ r.genre_display|default:'N/A' }}</td>
+            <td>
+                {% if 'error' in r %}
+                <span class="text-danger">ERROR: {{ r.error }}</span>
+                {% else %}
+                {{ r.match|yesno:"✅,❌" }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

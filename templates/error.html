@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Error | BookClassify{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .error-card {
+        border: none;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .error-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .error-header {
+        background: linear-gradient(135deg, #ff4d4d, #ff1a1a);
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .error-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .error-body {
+        padding: 2rem;
+    }
+    
+    .error-details {
+        background: rgba(255, 77, 77, 0.1);
+        border-left: 4px solid #ff4d4d;
+        padding: 1rem;
+        border-radius: 0 0.5rem 0.5rem 0;
+        margin: 1.5rem 0;
+    }
+    
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+    
+    .btn-error {
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .suggestions {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+    }
+    
+    .suggestion-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .suggestion-icon {
+        color: #ff4d4d;
+        margin-top: 0.2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .error-actions {
+            flex-direction: column;
+        }
+        
+        .btn-error {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+        /* Particle Background */
+        #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="col-lg-8">
+        <div class="error-card">
+            <div class="error-header">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="text-white mb-0">Prediction Failed</h2>
+            </div>
+            
+            <div class="error-body">
+                <div class="alert alert-danger border-0">
+                    <h4 class="alert-heading d-flex align-items-center">
+                        <i class="fas fa-times-circle me-2"></i>
+                        We encountered an error
+                    </h4>
+                    <p class="lead">{{ error }}</p>
+                </div>
+                
+                {% if exception %}
+                <div class="error-details">
+                    <h5 class="d-flex align-items-center">
+                        <i class="fas fa-bug me-2"></i>
+                        Technical Details
+                    </h5>
+                    <code class="text-danger">{{ exception }}</code>
+                </div>
+                {% endif %}
+                
+                <div class="suggestions">
+                    <h5 class="d-flex align-items-center mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Suggestions to try:
+                    </h5>
+                    
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle suggestion-icon"></i>
+                        <div>Ensure your file is in JPG, PNG, or PDF format</div>
+                    </div>
+                    
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle suggestion-icon"></i>
+                        <div>Check that the file size is under 5MB</div>
+                    </div>
+                    
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle suggestion-icon"></i>
+                        <div>Try a different book cover or document</div>
+                    </div>
+                </div>
+                
+                <div class="error-actions">
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-error">
+                        <i class="fas fa-redo"></i> Try Again
+                    </a>
+                    <a href="{% url 'home' %}#how-it-works" class="btn btn-outline-primary btn-error">
+                        <i class="fas fa-question-circle"></i> How It Works
+                    </a>
+                    <button class="btn btn-outline-secondary btn-error" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to error card
+        const card = document.querySelector('.error-card');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // Copy error details to clipboard
+        const copyErrorBtn = document.getElementById('copyErrorBtn');
+        if (copyErrorBtn) {
+            copyErrorBtn.addEventListener('click', function() {
+                const errorDetails = `Error: {{ error|escapejs }}\n\nDetails: {{ exception|escapejs }}`;
+                navigator.clipboard.writeText(errorDetails).then(() => {
+                    const originalText = copyErrorBtn.innerHTML;
+                    copyErrorBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        copyErrorBtn.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

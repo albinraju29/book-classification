@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+
+{% block title %}Recent Predictions | BookClassify{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Futuristic Glassmorphism Base */
+    body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Cybernetic Grid Background */
+    .container::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            linear-gradient(rgba(79,70,229,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79,70,229,0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    /* Neon Glass Cards */
+    .glass-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 
+            0 8px 32px rgba(0,0,0,0.2),
+            0 0 0 1px rgba(255,255,255,0.1) inset,
+            0 0 15px rgba(79,70,229,0.4);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 
+            0 12px 40px rgba(0,0,0,0.25),
+            0 0 0 1px rgba(255,255,255,0.2) inset,
+            0 0 25px rgba(79,70,229,0.6);
+    }
+
+    /* Holographic Cover Display */
+    .cover-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 20px 20px 0 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .cover-placeholder {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(118,75,162,0.1));
+        border-radius: 20px 20px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cover-placeholder i {
+        color: rgba(79,70,229,0.5);
+        font-size: 3rem;
+        z-index: 1;
+    }
+
+    .cover-placeholder::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: conic-gradient(
+            from 45deg,
+            transparent 0% 25%,
+            rgba(79,70,229,0.15) 25% 50%,
+            transparent 50% 75%,
+            rgba(79,70,229,0.15) 75% 100%
+        );
+        background-size: 50px 50px;
+        animation: hologram-scan 6s linear infinite;
+    }
+
+    @keyframes hologram-scan {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 100px; }
+    }
+
+    /* Card Content Styling */
+    .card-content {
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    .card-content::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border: 2px solid rgba(79,70,229,0.2);
+        border-radius: 20px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .glass-card:hover .card-content::before {
+        opacity: 1;
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+    }
+
+    /* Holographic Genre Badge */
+    .genre-badge {
+        background: linear-gradient(135deg, 
+            rgba(102,126,234,0.8), 
+            rgba(118,75,162,0.8));
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.3);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+
+    .genre-badge::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.3) 50%,
+            rgba(255,255,255,0) 100%
+        );
+        transform: rotate(30deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) rotate(30deg); }
+        100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    /* Futuristic Button */
+    .view-more-btn {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 1rem;
+        padding: 0.6rem 1.2rem;
+        background: rgba(79,70,229,0.15);
+        color: #a5b4fc;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(79,70,229,0.3);
+        font-weight: 500;
+    }
+
+    .view-more-btn:hover {
+        background: rgba(79,70,229,0.3);
+        color: #e0e7ff;
+        text-decoration: none;
+        box-shadow: 0 0 10px rgba(79,70,229,0.3);
+    }
+
+    .view-more-btn i {
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .view-more-btn:hover i {
+        transform: translateX(3px);
+    }
+
+    /* Grid Layout */
+    .prediction-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 2rem 0;
+    }
+
+    /* Futuristic Header */
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, #a5b4fc, #8b5cf6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+        position: relative;
+    }
+
+    .page-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+        box-shadow: 0 0 10px #4f46e5, 0 0 20px #8b5cf6;
+        animation: neon-pulse 2s infinite alternate;
+        border-radius: 3px;
+    }
+
+    .page-header p {
+        color: #94a3b8;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    @keyframes neon-pulse {
+        0% { opacity: 0.7; width: 100px; }
+        100% { opacity: 1; width: 120px; }
+    }
+
+    /* Empty State */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 20px;
+        border: 1px dashed rgba(79,70,229,0.3);
+    }
+
+    .empty-state p {
+        margin-bottom: 1.5rem;
+        color: #94a3b8;
+    }
+
+    .upload-btn {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(79,70,229,0.3);
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(79,70,229,0.4);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .prediction-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+        }
+    }
+
+    /* Particle Background */
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Particle Background -->
+<div id="particles-js"></div>
+
+<section class="container">
+    <!-- Futuristic Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-history"></i> PREDICTION ARCHIVE</h1>
+        <p>machine Learning Analysis Results From Your Previous Book Classifications</p>
+    </div>
+
+    <!-- Prediction Grid -->
+    <div class="prediction-grid">
+        {% for prediction in recent_predictions %}
+        <div class="glass-card">
+            <!-- Holographic Cover Display -->
+            {% if prediction.image_file %}
+                <img src="{{ prediction.image_file.url }}" alt="Book cover" class="cover-image">
+            {% else %}
+                <div class="cover-placeholder">
+                    <i class="fas fa-book"></i>
+                </div>
+            {% endif %}
+            
+            <div class="card-content">
+                <!-- Holographic Genre Badge -->
+                <div class="genre-badge">{{ prediction.predicted_genre }}</div>
+                
+                <!-- Metadata -->
+                <p class="text-muted" style="margin-top: 0.5rem;">
+                    <i class="fas fa-clock"></i> {{ prediction.uploaded_at|timesince }} ago
+                </p>
+                
+                <!-- View More Button -->
+                <a href="{% url 'prediction_detail' prediction.id %}" class="view-more-btn">
+                    ACCESS DETAILS <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <p>No classification data found in the machine learning prediction archive</p>
+            <a href="{% url 'home' %}" class="upload-btn">
+                <i class="fas fa-upload"></i> INITIATE NEW SCAN
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Particles.js Script -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize particle background
+    particlesJS('particles-js', {
+        "particles": {
+            "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
+            "color": { "value": "#4f46e5" },
+            "shape": { "type": "circle" },
+            "opacity": { "value": 0.4, "random": true },
+            "size": { "value": 3, "random": true },
+            "line_linked": { 
+                "enable": true, 
+                "distance": 150, 
+                "color": "#4f46e5", 
+                "opacity": 0.2, 
+                "width": 1 
+            },
+            "move": { 
+                "enable": true, 
+                "speed": 1.5, 
+                "direction": "none", 
+                "random": true, 
+                "straight": false 
+            }
+        },
+        "interactivity": {
+            "events": { 
+                "onhover": { 
+                    "enable": true, 
+                    "mode": "repulse" 
+                } 
+            }
+        }
+    });
+
+    // 3D Parallax Effect for Cards
+    const cards = document.querySelectorAll('.glass-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 15;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 15;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+        
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'all 0.1s ease';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+            card.style.transition = 'all 0.5s ease';
+        });
+    });
+});
+</script>
+{% endblock %}

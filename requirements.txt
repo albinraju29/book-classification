@@ -1,0 +1,14 @@
+Django>=3.0,<4.0
+numpy>=1.20.0
+scikit-learn>=1.0.0  # Updated for better compatibility
+joblib>=1.0.0
+easyocr>=1.4.1
+nltk>=3.6.0
+Pillow>=9.0.0  # Required for image uploads in Django
+torch>=1.10.0  # Required by EasyOCR (CPU version)
+opencv-python>=4.5.0  # Required by EasyOCR
+python-dotenv>=0.15.0  # Optional but recommended
+python-magic>=0.4.24  # For file type validation (optional but useful)
+gunicorn>=20.0.0  # For production deployment
+whitenoise>=6.0.0  # For static files
+psycopg2-binary>=2.9.0  # If using PostgreSQL

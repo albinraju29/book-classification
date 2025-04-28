@@ -1,0 +1,564 @@
+{% extends 'base.html' %}
+
+{% block title %}BookClassify - Neural Network Genre Detection{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --header-height: 4rem;
+    }
+
+    /* Cyberpunk Hero Section */
+    .hero {
+        background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9));
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        margin-top: var(--header-height); /* ✅ ADD THIS */
+        padding: 6rem 0 8rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(79,70,229,0.2);
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    .hero h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(90deg, var(--cyber-accent), var(--neon-purple));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    
+    .hero p {
+        font-size: 1.25rem;
+        color: var(--cyber-accent);
+        margin-bottom: 2.5rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Cyberpunk Steps */
+    .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .step {
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.15);
+        padding: 2.5rem 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-align: center;
+    }
+    
+    .step:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+        border: 1px solid rgba(79,70,229,0.4);
+    }
+    
+    .step-icon {
+        font-size: 2.5rem;
+        color: var(--neon-purple);
+        margin-bottom: 1.5rem;
+        background: rgba(79, 70, 229, 0.15);
+        width: 80px;
+        height: 80px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(79,70,229,0.3);
+    }
+    
+    .step h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .step p {
+        color: var(--cyber-accent);
+        font-size: 1rem;
+    }
+    
+    /* Cyberpunk Upload Section */
+    .upload-section {
+        padding: 6rem 0;
+        position: relative;
+    }
+    
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+    
+    .upload-container h2 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--cyber-accent);
+        margin-bottom: 2rem;
+        text-align: center;
+        letter-spacing: 1px;
+    }
+    
+    .upload-area {
+        border: 2px dashed rgba(79,70,229,0.4);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        background: rgba(79,70,229,0.05);
+    }
+    
+    .upload-area:hover {
+        border-color: var(--neon-purple);
+        background: rgba(79,70,229,0.1);
+    }
+    
+    .upload-area.active {
+        border-color: var(--cyber-success);
+        background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--neon-purple);
+        margin-bottom: 1.5rem;
+    }
+    
+    .upload-area h3 {
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-area p {
+        color: var(--cyber-accent);
+        margin-bottom: 0;
+    }
+    
+    .file-types {
+        font-size: 0.85rem;
+        color: var(--cyber-accent);
+        margin-top: 1.5rem;
+    }
+    
+    /* Cyberpunk File Preview */
+    .file-preview-card {
+        display: flex;
+        align-items: center;
+        background: rgba(30,41,59,0.7);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(79,70,229,0.3);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .file-preview-card:hover {
+        border-color: var(--neon-purple);
+        background: rgba(30,41,59,0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(79,70,229,0.2);
+    }
+    
+    .file-icon {
+        font-size: 1.5rem;
+        color: var(--neon-purple);
+        margin-right: 1rem;
+        min-width: 40px;
+        text-align: center;
+    }
+    
+    .file-details {
+        flex: 1;
+        min-width: 0;
+    }
+    .file-input {
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .file-name {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .file-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: var(--cyber-accent);
+        flex-wrap: wrap;
+    }
+    
+    .file-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .remove-file {
+        color: var(--cyber-error);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        margin-left: 0.5rem;
+        background: transparent;
+        border: none;
+        font-size: 1rem;
+    }
+    
+    .remove-file:hover {
+        background: rgba(239,68,68,0.2);
+        color: #dc2626;
+        transform: scale(1.1);
+    }
+    
+    /* Cyberpunk Textarea */
+    textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid rgba(79,70,229,0.3);
+        border-radius: 12px;
+        resize: vertical;
+        min-height: 150px;
+        margin-bottom: 1.5rem;
+        font-family: 'Rajdhani', sans-serif;
+        transition: all 0.3s ease;
+        background: rgba(30,41,59,0.7);
+        color: white;
+    }
+    
+    textarea:focus {
+        outline: none;
+        border-color: var(--neon-purple);
+        box-shadow: 0 0 0 3px rgba(79,70,229,0.3);
+    }
+    
+    textarea::placeholder {
+        color: var(--cyber-accent);
+        opacity: 0.7;
+    }
+    
+    /* Cyberpunk Badge */
+    .optional-badge {
+        background: rgba(79,70,229,0.2);
+        color: var(--cyber-accent);
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+        font-weight: 500;
+        border: 1px solid rgba(79,70,229,0.3);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+        }
+        
+        .upload-container {
+            padding: 2rem;
+        }
+        
+        .steps {
+            grid-template-columns: 1fr;
+        }
+        
+        .file-preview-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .file-icon {
+            margin-right: 0;
+            margin-bottom: 0.75rem;
+        }
+        
+        .remove-file {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
+    }
+    /* Particle Background */
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spin-icon {
+    animation: spin 1s linear infinite;
+    background: red;
+}
+@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .spin-icon {
+        animation: spin 1s linear infinite;
+    }
+
+    /* Rest of your existing styles... */
+    :root {
+        --header-height: 4rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" id="Home">
+    <div class="hero-content">
+        <h1 class="animate__animated animate__fadeInDown">
+            <i class="fas fa-brain-circuit"></i> DISCOVER YOUR BOOK GENRE
+        </h1>
+        <p class="animate__animated animate__fadeIn animate__delay-1s">
+            Upload a book cover or document, and our ML classifier will analyze its content with 84.3% prediction accuracy.
+        </p>
+        <a href="#upload" class="btn-cyber btn-cyber-primary animate__animated animate__fadeInUp animate__delay-1s">
+            <i class="fas fa-network-wired"></i> INITIATE SCAN
+        </a>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section" id="how-it-works">
+    <div class="container">
+        <div class="section-title">
+            <h2 class="animate__animated animate__fadeIn">MACHINE LEARNING ANALYSIS PROCESS</h2>
+            <p class="animate__animated animate__fadeIn animate__delay-1s">Advanced machine learning workflow</p>
+        </div>
+        <div class="steps">
+            <div class="step animate__animated animate__fadeInUp">
+                <div class="step-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3>DATA UPLOAD</h3>
+                <p>Provide book cover image or document (JPG, PNG, PDF)</p>
+            </div>
+            <div class="step animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="step-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>PROCESSING</h3>
+                <p>Machine learning models analyze visual and textual patterns</p>
+            </div>
+            <div class="step animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="step-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>PREDICTION OUTPUT</h3>
+                <p>Receive detailed genre predictions</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upload Section -->
+<section class="upload-section" id="upload">
+    <div class="container">
+        {% if error %}
+        <div class="alert-cyber alert-error mb-4">{{ error }}</div>
+        {% endif %}
+        
+        <div class="upload-container">
+            <h2><i class="fas fa-upload"></i> CLASSIFIY YOUR BOOK</h2>
+            <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'predict' %}">
+                {% csrf_token %}
+                <label for="fileUpload" class="upload-area" id="uploadLabel">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h3>DRAG & DROP FILE</h3>
+                    <p>or click to select from storage</p>
+                    <div class="file-types">SUPPORTED FORMATS: JPG, PNG, PDF (MAX 5MB)</div>
+                    <input type="file" id="fileUpload" class="file-input" name="file" accept=".jpg,.jpeg,.png,.pdf" required>
+                </label>
+                
+                <div id="filePreview" class="file-preview-container"></div>
+                
+                <div class="mb-4">
+                    <label for="description" style="color: var(--cyber-accent); display: block; margin-bottom: 0.5rem;">
+                        BOOK DESCRIPTION <span class="optional-badge">OPTIONAL</span>
+                    </label>
+                    <textarea id="description" name="description" rows="3" 
+                            placeholder="(Optional) Enter book synopsis to enhance neural network accuracy..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn-cyber btn-cyber-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                    <i class="fas fa-cogs"></i> EXECUTE ANALYSIS
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('fileUpload');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const filePreview = document.getElementById('filePreview');
+        const form = document.getElementById('uploadForm');
+        
+        // File input change handler
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                uploadLabel.classList.add('active');
+                
+                // Determine file type icon
+                let fileIcon = 'file-alt';
+                if (file.type.includes('image')) fileIcon = 'file-image';
+                else if (file.type.includes('pdf')) fileIcon = 'file-pdf';
+                
+                filePreview.innerHTML = `
+                    <div class="file-preview-card">
+                        <div class="file-icon">
+                            <i class="fas fa-${fileIcon}"></i>
+                        </div>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-meta">
+                                <span><i class="fas fa-file"></i> ${file.type || 'UNKNOWN TYPE'}</span>
+                                <span><i class="fas fa-database"></i> ${(file.size/1024/1024).toFixed(2)} MB</span>
+                            </div>
+                        </div>
+                        <div class="remove-file" id="removeFileBtn">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listener to remove button
+                document.getElementById('removeFileBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileInput.value = '';
+                    filePreview.innerHTML = '';
+                    uploadLabel.classList.remove('active');
+                });
+            }
+        });
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadLabel.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadLabel.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadLabel.style.borderColor = 'var(--neon-purple)';
+            uploadLabel.style.background = 'rgba(79,70,229,0.2)';
+        }
+        
+        function unhighlight(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadLabel.style.borderColor = 'rgba(79,70,229,0.4)';
+            uploadLabel.style.background = 'rgba(79,70,229,0.05)';
+        }
+        
+        // Handle drop
+        uploadLabel.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            unhighlight(e);
+            
+            const dt = e.dataTransfer;
+            if (dt.files.length) {
+                fileInput.files = dt.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+        
+        // Form submission - validate file
+        form.addEventListener('submit', function(e) {
+            // Your existing validation code...
+            
+            // Get the button and icon more reliably
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const icon = submitBtn.querySelector('i.fa-cogs');
+
+            console.log('Form submit triggered'); // Should appear when submitting
+            console.log('Submit button:', submitBtn); // Should show the button element
+            console.log('Icon element:', icon); // Should show the icon element
+            
+            // Apply spinning directly to the icon
+            if (icon) {
+                icon.classList.add('fa-spin'); // Font Awesome has its own spin class
+            }
+            
+            // Alternative if Font Awesome spin isn't working
+            icon.classList.add('spin-icon');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-cogs fa-spin"></i> PROCESSING...';
+        });
+    });
+</script>
+{% endblock %}
