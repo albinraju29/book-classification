@@ -4,25 +4,20 @@
 A Django web application that classifies book genres using machine learning (OCR + text classification).
 
 Input Design
- 🌟 Key Features Visualized
+ 🌟 Key Features Visualised
 
-![Upload Interface](https://github.com/albinraju29/book-classification/raw/main/i2.PNG)  
-*Drag-and-drop or click to upload book covers*
+![Image](https://github.com/user-attachments/assets/ca14d992-1ff5-44f9-beee-baffebaa34fe)
 
-![Analysis Screen](https://github.com/albinraju29/book-classification/raw/main/i2.PNG)  
-*Text extraction and classification in progress*
+![Image](https://github.com/user-attachments/assets/4e896f2b-8c75-461f-8ed8-d67453f03fe5)
+![Image](https://github.com/user-attachments/assets/b9fdf96b-0010-47b6-8160-1fec620896c4)
 
-![Prediction Output](https://github.com/albinraju29/book-classification/raw/main/o1.PNG)  
-Genre prediction with confidence score
-
-![Text Extraction](https://github.com/albinraju29/book-classification/raw/main/o2.PNG)  
-*Raw extracted text from the book cover*
 
 
 Output Design
 
-https://github.com/albinraju29/book-classification/blob/main/o1.PNG
-https://github.com/albinraju29/book-classification/blob/main/o2.PNG
+![Image](https://github.com/user-attachments/assets/be0de5c6-eb6f-473e-a196-4e984ac351ca)
+
+![Image](https://github.com/user-attachments/assets/9c278585-fb15-4026-8542-595bf9ca51df)
 
 
  🌟 Features
